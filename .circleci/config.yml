@@ -1,32 +1,19 @@
 version: 2.1
 
-orbs:
-  go: circleci/go@1.1.1
+executors:
+  go:
+    docker:
+      - image: docker.mirror.hashicorp.services/cimg/go:1.17
 
 jobs:
   test:
-    executor: 
-      name: go/default
-      tag: << parameters.go-version >>
-    parameters:
-      go-version:
-        type: string
-    environment:
-      GO111MODULE: "on"
-    working_directory: /go/src/github.com/hashicorp/terraform-config-inspect
+    executor:
+      name: go
     steps:
       - checkout
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
       - run: go test
-      - run: go install .
 
 workflows:
   terraform-config-inspect:
     jobs:
-      - test:
-          matrix:
-            parameters:
-              go-version: ["1.11.13", "1.13.4"]
-          name: test-go-<< matrix.go-version >>
+      - test
